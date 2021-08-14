@@ -8,6 +8,11 @@ __pycache__/
 *.py[cod]
 *$py.class
 
+# Data
+*.json
+*.ipynb
+*.txt
+
 # C extensions
 *.so
 
