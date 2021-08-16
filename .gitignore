@@ -13,6 +13,11 @@ __pycache__/
 *.ipynb
 *.txt
 
+# Checkpoint
+*.pt
+*.bin
+*.pth
+
 # C extensions
 *.so
 
