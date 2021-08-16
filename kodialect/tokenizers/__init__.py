@@ -1,2 +1,2 @@
 from transformers import PreTrainedTokenizerFast
-from tokenization_kodialect import KodialectTokenizerFast
+from .tokenization_kodialect import KodialectTokenizerFast
