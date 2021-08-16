@@ -20,6 +20,7 @@ class TextCNNSequenceClassificerOutput(ModelOutput):
     last_hidden_states: torch.FloatTensor = None
     ngram_feature_maps: List[torch.FloatTensor] = None
 
+
 class TextCNNPreTrainedModel(PreTrainedModel):
     config_class = TextCNNConfig
     base_model_prefix = "textcnn"
