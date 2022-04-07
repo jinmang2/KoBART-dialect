@@ -172,7 +172,7 @@ if __name__ == "__main__":
         train_samples = prepare_dialect_dataset(train_files)
         json.dump({"data": train_samples}, open("data/train_dialect.json", "w"))
     
-    if not os.path.isfile("data/*/valid/*.json"):
+    if not os.path.isfile("data/valid_dialect.json"):
         valid_files = glob("data/*/valid/*.json")
         valid_samples = prepare_dialect_dataset(valid_files)
         json.dump({"data": valid_samples}, open("data/valid_dialect.json", "w"))
