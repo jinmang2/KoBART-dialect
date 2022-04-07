@@ -147,6 +147,25 @@ def prepare_for_style_classification(examples: Batch) -> Union[Dict, Any]:
     return new_examples
 
 
+def prepare_for_style_transfer(examples: Batch) -> Union[Dict, Any]:
+    ids = examples["id"]
+    dos = examples["do"]
+    standard_texts = examples["standard"]
+    dialect_texts = examples["dialect"]
+
+    new_examples = {"id": [], "source": [], "target": [], "src_lang": [], "tgt_lang": []}
+
+    iterator = zip(ids, dos, standard_texts, dialect_texts)
+    for _id, do, standard_text, dialect_text in iterator:
+        new_examples["id"].extend([_id, _id])
+        new_examples["source"].extend([standard_text, dialect_text])
+        new_examples["target"].extend([dialect_text, standard_text])
+        new_examples["src_lang"].extend(["standard", do])
+        new_examples["tgt_lang"].extend([do, "standard"])
+        
+    return new_examples
+
+
 if __name__ == "__main__":
     if not os.path.isfile("data/train_dialect.json"):
         train_files = glob("data/*/train/*.json")
@@ -167,6 +186,10 @@ if __name__ == "__main__":
         function=prepare_for_style_classification, batched=True, batch_size=1000,
         remove_columns=dialect_dataset.column_names["train"],
     )
+    dialect_dataset_for_st = dialect_dataset.map(
+        function=prepare_for_style_transfer, batched=True, batch_size=1000,
+        remove_columns=dialect_dataset.column_names["train"],
+    )
     
-    dialect_dataset.save_to_disk("data/style_transfer")
     dialect_dataset_for_sc.save_to_disk("data/style_classification")
+    dialect_dataset_for_st.save_to_disk("data/style_transfer")

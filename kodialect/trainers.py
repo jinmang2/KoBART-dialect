@@ -1,18 +1,33 @@
+from dataclasses import dataclass, field
+from typing import Any, Dict, List, Tuple, Union, Optional
+
 import torch
 import torch.nn as nn
-
-from typing import Any, Dict, List, Tuple, Union
-from dataclasses import dataclass, field
 
 from nltk.translate.bleu_score import sentence_bleu
 from nltk.translate.bleu_score import SmoothingFunction
 
-from transformers import Seq2SeqTrainer, Seq2SeqTrainingArguments
+from transformers import (
+    Trainer,
+    Seq2SeqTrainer,
+    TrainingArguments,
+    Seq2SeqTrainingArguments,
+)
+from transformers.trainer_pt_utils import nested_detach
+
+
+@dataclass
+class StyleClassifierTrainingArguments(TrainingArguments):
+    pass
 
 
 @dataclass
 class KodialectTrainingArguments(Seq2SeqTrainingArguments):
     temperature: float = field(default=1.0)
+
+
+class StyleClassifierTrainer(Trainer):
+    pass
 
 
 class KodialectTrainer(Seq2SeqTrainer):
@@ -155,6 +170,12 @@ class KodialectTrainer(Seq2SeqTrainer):
         has_labels = "labels" in inputs
         inputs = self._prepare_inputs(inputs)
 
+        if ignore_keys is None:
+            if hasattr(self.model, "config"):
+                ignore_keys = getattr(self.model.config, "keys_to_ignore_at_inference", [])
+            else:
+                ignore_keys = []
+
         with torch.no_grad():
             if has_labels:
                 loss, outputs = self.compute_loss(model, inputs, return_outputs=True)
@@ -180,5 +201,17 @@ class KodialectTrainer(Seq2SeqTrainer):
         lang_idxs = input_ids.eq(eos_token_id).long().argmax(dim=-1) - 1
         standard_token = self.tokenizer.lang_code_to_id["[kr_KR]"]
         labels = input_ids[idxs, lang_idxs].ne(standard_token).long()
+
+        logits = nested_detach(logits)[0]
+        preds = logits.argmax(-1)
+        tgt = []
+        for pred in preds:
+            e = torch.arange(len(pred))[pred.eq(self.tokenizer.eos_token_id)]
+            e = e[0] if 0 < len(e) and e[0] < 30 else 30
+            tgt.append(pred[:e].cpu().tolist())
+        tgt = self.tokenizer.pad({"input_ids": tgt}, return_tensors="pt")
+        tgt = tgt["input_ids"].to(self.args.device)
+        with torch.no_grad():
+            logits = self.classifier(tgt).logits # y_hat
 
         return (loss, logits, labels)

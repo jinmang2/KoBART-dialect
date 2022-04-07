@@ -8,12 +8,12 @@ from tokenizers.processors import TemplateProcessing
 class KodialectTokenizerFast(PreTrainedTokenizerFast):
 
     code_to_langs = {
-        '표준': '[kr_KR]',
-        '충청': '[kr_CC]',
-        '강원': '[kr_GW]',
-        '경상': '[kr_GS]',
-        '제주': '[kr_JJ]',
-        '전라': '[kr_JL]',
+        'standard': '[kr_KR]',
+        'chungcheongdo': '[kr_CC]',
+        'gangwondo': '[kr_GW]',
+        'gyeongsangdo': '[kr_GS]',
+        'jejudo': '[kr_JJ]',
+        'jeollado': '[kr_JL]',
     }
 
     def __init__(self, *args, **kwargs):
