@@ -1,5 +1,8 @@
 # KoBART-dialect
 
+**WIP**
+- 만족할만한 성능 나오면 배포
+
 ## Data preparing
 
 - First, download the file below from [aihub](https://aihub.or.kr/aihub-data/natural-language/about) and set it up as follows.
