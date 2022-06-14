@@ -8,6 +8,7 @@ data/gyeongsangdo
 for DIR in $DIRS; do
     if [ ! -d $DIR ]; then
         echo "make directory train and valid on {$DIR}."
+        mkdir $DIR
         mkdir $DIR/train
         mkdir $DIR/valid
     else
